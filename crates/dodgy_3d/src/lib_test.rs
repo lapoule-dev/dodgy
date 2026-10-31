@@ -31,6 +31,7 @@ mod get_plane_for_neighbour_tests {
     let radius = 2.0;
 
     let agent = Agent {
+      id: 0,
       position: Vec3::ZERO,
       velocity: Vec3::ZERO,
       radius: radius - 1.0,
@@ -38,6 +39,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 1,
       position: position,
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -60,6 +62,7 @@ mod get_plane_for_neighbour_tests {
   #[test]
   fn velocity_projects_to_shadow() {
     let mut agent = Agent {
+      id: 2,
       position: Vec3::ZERO,
       velocity: Vec3::new(1.0, 3.0, 0.0),
       radius: 1.0,
@@ -67,6 +70,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 3,
       position: Vec3::new(2.0, 2.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -101,6 +105,7 @@ mod get_plane_for_neighbour_tests {
   #[test]
   fn collision_uses_time_step() {
     let agent = Agent {
+      id: 4,
       position: Vec3::ZERO,
       velocity: Vec3::ZERO,
       radius: 2.0,
@@ -108,6 +113,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 5,
       position: Vec3::new(2.0, 2.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 2.0,
@@ -131,6 +137,7 @@ mod get_plane_for_neighbour_tests {
   #[test]
   fn no_collision_uses_time_horizon() {
     let agent = Agent {
+      id: 6,
       position: Vec3::ZERO,
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -138,6 +145,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 7,
       position: Vec3::new(2.0, 2.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -159,6 +167,7 @@ mod get_plane_for_neighbour_tests {
   #[test]
   fn uses_avoidance_responsibility() {
     let agent = Agent {
+      id: 8,
       position: Vec3::ZERO,
       velocity: Vec3::new(1.5, 0.0, 0.0),
       radius: 1.0,
@@ -166,6 +175,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 9,
       position: Vec3::new(4.0, 0.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -187,6 +197,7 @@ mod get_plane_for_neighbour_tests {
   #[test]
   fn uses_avoidance_responsibility_only_when_inside_vo() {
     let agent = Agent {
+      id: 10,
       position: Vec3::ZERO,
       velocity: Vec3::new(0.5, 0.0, 0.0),
       radius: 1.0,
@@ -194,6 +205,7 @@ mod get_plane_for_neighbour_tests {
     };
 
     let neighbour = Agent {
+      id: 11,
       position: Vec3::new(4.0, 0.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 1.0,
@@ -223,6 +235,7 @@ mod compute_avoiding_velocity {
   #[test]
   fn moves_apart_if_directly_on_top_of_each_other() {
     let agent = Agent {
+      id: 12,
       position: Vec3::ZERO,
       velocity: Vec3::ZERO,
       radius: 0.5,
@@ -237,8 +250,8 @@ mod compute_avoiding_velocity {
       &AvoidanceOptions { time_horizon: 1.0 },
     );
 
-    // Agents will move in a random direction if they are perfectly on top of
-    // one another.
+    // Agents will move in a deterministic direction (derived from their ids)
+    // if they are perfectly on top of one another.
     assert_ne!(avoiding_velocity, Vec3::ZERO);
   }
 }

@@ -22,7 +22,10 @@
 mod common;
 mod linear_programming;
 mod obstacles;
+#[cfg(feature = "simulator")]
 mod simulator;
+mod tie_break;
+#[cfg(feature = "visibility-set")]
 mod visibility_set;
 
 #[cfg(feature = "debug")]
@@ -38,12 +41,23 @@ use obstacles::get_lines_for_agent_to_obstacle;
 
 pub use obstacles::Obstacle;
 
+#[cfg(feature = "simulator")]
 pub use simulator::{AgentParameters, Simulator, SimulatorMargin};
+#[cfg(feature = "visibility-set")]
 pub use visibility_set::VisibilitySet;
 
 /// A single agent in the simulation.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Agent {
+  /// A caller-provided key identifying this agent, used only to break ties
+  /// deterministically. When the agent and a neighbour are in a degenerate
+  /// configuration (e.g. exactly on top of each other with the same velocity),
+  /// the direction in which they separate is derived from the pair of keys:
+  /// the agent with the smaller key moves along some direction `d` and the
+  /// other along `-d`. Keys should therefore be unique among agents that can
+  /// be neighbours of each other (an entity id is a good choice); two agents
+  /// with the same key still get a deterministic result, but do not separate.
+  pub id: u64,
   /// The position of the agent.
   pub position: Vec2,
   /// The current velocity of the agent.
@@ -83,6 +97,18 @@ impl Agent {
   /// the `preferred_velocity` is larger than `max_speed`, the resulting vector
   /// will be at most `max_speed` in length. The `time_step` helps determine the
   /// velocity in cases of existing collisions, and must be positive.
+  ///
+  /// # Determinism
+  ///
+  /// This function is a pure function of its arguments: it uses no random
+  /// numbers, no hash containers and no platform-dependent math (only
+  /// `+ - * /`, `sqrt` and comparisons, without fused multiply-add), so the
+  /// same inputs produce bit-identical outputs on every platform. Degenerate
+  /// pairs are resolved with [`Agent::id`]. The constraints are solved
+  /// incrementally in the order they are given, so while the result is
+  /// mathematically the same for any order of `neighbours` (and `obstacles`), the last bits
+  /// may differ: give them in a stable order (e.g. sorted by [`Agent::id`]) if
+  /// bit-identical results are required.
   pub fn compute_avoiding_velocity(
     &self,
     neighbours: &[Cow<'_, Agent>],
@@ -361,15 +387,14 @@ impl Agent {
       vo_normal = {
         let velocity_from_circle_center =
           relative_agent_velocity - cutoff_circle_center;
-        // If the vector has a length of zero, pick a random direction. Fork the
-        // implementation of `normalize_or` so we only compute random
-        // values if necessary (which should be very rare).
+        // If the vector has a length of zero, there is no natural normal. Pick
+        // a direction derived from both agents' keys, so the result is
+        // deterministic and the two agents separate in opposite directions.
         let recip = velocity_from_circle_center.length_recip();
         if recip.is_finite() && recip > 0.0 {
           velocity_from_circle_center * recip
         } else {
-          let angle: f32 = rand::random();
-          Vec2::new(angle.cos(), angle.sin())
+          tie_break::separation_direction(self.id, neighbour.id)
         }
       };
       // Get the point on the cut-off circle in that direction (which is the
@@ -406,3 +431,7 @@ type AvoidingVelocityReturn = Vec2;
 #[cfg(test)]
 #[path = "lib_test.rs"]
 mod test;
+
+#[cfg(test)]
+#[path = "determinism_test.rs"]
+mod determinism_test;

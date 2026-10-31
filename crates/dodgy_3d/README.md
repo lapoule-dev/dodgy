@@ -31,6 +31,7 @@ use dodgy_3d::{Agent, AvoidanceOptions, Vec3};
 
 let mut agents: Vec<Cow<'static, Agent>> = vec![
   Cow::Owned(Agent {
+    id: 0,
     position: Vec3::ZERO,
     velocity: Vec3::ZERO,
     radius: 1.0,
@@ -95,15 +96,17 @@ spatial query. Often, finding related objects within some radius is performed
 anyway in most game engines. Using this API, neighbours can be found through
 your regular spatial queries, and exposes just the avoidance part.
 
-However, an alternative using the `Simulator` struct:
+However, an alternative using the `Simulator` struct (requires the optional
+`simulator` feature):
 
-```rust
+```rust,ignore
 use dodgy_3d::{
   Agent, AvoidanceOptions, AgentParameters, Simulator, SimulatorMargin, Vec3
 };
 
 let mut simulator = Simulator::new();
 simulator.add_agent(Agent {
+  id: 1,
   position: Vec3::ZERO,
   velocity: Vec3::ZERO,
   radius: 1.0,
