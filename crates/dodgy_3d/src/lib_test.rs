@@ -40,7 +40,7 @@ mod get_plane_for_neighbour_tests {
 
     let neighbour = Agent {
       id: 1,
-      position: position,
+      position,
       velocity: Vec3::ZERO,
       radius: 1.0,
       avoidance_responsibility: 1.0,

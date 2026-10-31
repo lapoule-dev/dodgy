@@ -106,9 +106,9 @@ impl Agent {
   /// same inputs produce bit-identical outputs on every platform. Degenerate
   /// pairs are resolved with [`Agent::id`]. The constraints are solved
   /// incrementally in the order they are given, so while the result is
-  /// mathematically the same for any order of `neighbours` (and `obstacles`), the last bits
-  /// may differ: give them in a stable order (e.g. sorted by [`Agent::id`]) if
-  /// bit-identical results are required.
+  /// mathematically the same for any order of `neighbours` (and `obstacles`),
+  /// the last bits may differ: give them in a stable order (e.g. sorted by
+  /// [`Agent::id`]) if bit-identical results are required.
   pub fn compute_avoiding_velocity(
     &self,
     neighbours: &[Cow<'_, Agent>],

@@ -67,7 +67,7 @@ fn agent_collides_with_edge() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -96,7 +96,7 @@ fn agent_collides_with_left_vertex() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -124,7 +124,7 @@ fn agent_collides_with_right_vertex_with_line() {
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0)];
+  let vertices = [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -153,7 +153,7 @@ fn agent_collides_with_right_vertex_handled_by_next_edge() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -191,7 +191,7 @@ fn agent_velocity_projects_to_cutoff_line() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -220,7 +220,7 @@ fn agent_velocity_projects_to_shadows() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -265,7 +265,7 @@ fn agent_velocity_projects_to_covered_shadows_creates_no_lines() {
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![
+  let vertices = [
     Vec2::new(-2.0, 0.5),
     Vec2::new(-1.0, 0.0),
     Vec2::new(1.0, 0.0),
@@ -333,7 +333,7 @@ fn backwards_edges_are_ignored() {
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![Vec2::new(-1.0, -1.0), Vec2::new(-1.0, 1.0)];
+  let vertices = [Vec2::new(-1.0, -1.0), Vec2::new(-1.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
