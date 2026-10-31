@@ -15,20 +15,27 @@ from upstream as follows:
   derived from the pair of keys with integer hashing: the agent with the
   smaller key moves along some direction `d`, the other one along `-d`. The
   `rand` dependency is gone.
-- **Portable arithmetic.** The default build uses only `+ - * /`, `sqrt` and
-  comparisons (no trigonometry, no fused multiply-add, no hash containers), so
-  `Agent::compute_avoiding_velocity` gives bit-identical results on every
-  platform. Give neighbours and obstacles in a stable order (e.g. sorted by
-  `id`): the result is mathematically independent of the order, but the last
-  bits are not. Inputs must be finite: NaN payloads are not portable.
+- **Portable arithmetic.** The per-agent computation uses only `+ - * /`,
+  `sqrt` and comparisons (no trigonometry, no fused multiply-add, no hash
+  containers), so `Agent::compute_avoiding_velocity` gives bit-identical
+  results on every platform. Give neighbours and obstacles in a stable order
+  (e.g. sorted by `id`): the result is mathematically independent of the
+  order, but the last bits are not. Inputs must be finite: NaN payloads are
+  not portable.
+- **Transcendentals via libm.** `VisibilitySet` needs trigonometry, so it is
+  only compiled with the non-default `libm` feature. Its `atan2`, `sin` and
+  `cos` then come from the pure-Rust [`libm`](https://crates.io/crates/libm)
+  crate (the same bits on every target) instead of the platform `f32` methods,
+  and `get_visible_line_ids` returns a `BTreeSet` (stable iteration order)
+  instead of a `HashSet`. Without the feature, nothing in the crate uses
+  trigonometry.
 - **glam 0.33** instead of 0.29.
 - **Optional `Simulator`.** The O(n²) `Simulator` is behind the non-default
-  `simulator` feature. `VisibilitySet` (which uses `atan2`/`sin` and returns
-  a `HashSet`) is behind the non-default `visibility-set` feature. The default
-  build is just the per-agent ORCA computation, fed with your own
-  neighbour queries.
-- **Determinism tests**, including a recorded golden scene that CI checks on
-  Linux (x86_64) and macOS (aarch64), and a wasm32 build check.
+  `simulator` feature. The default build is just the per-agent ORCA
+  computation, fed with your own neighbour queries.
+- **Determinism tests**, including recorded golden scenes (ORCA, and
+  `VisibilitySet` with `libm`) that CI checks on Linux (x86_64) and macOS
+  (aarch64), and a wasm32 build check.
 
 We intend to propose these changes upstream.
 

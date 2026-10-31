@@ -18,7 +18,8 @@ from upstream as follows:
 - **Portable arithmetic.** The default build uses only `+ - * /`, `sqrt` and
   comparisons (no trigonometry, no fused multiply-add, no hash containers), so
   `Agent::compute_avoiding_velocity` gives bit-identical results on every
-  platform. Give neighbours in a stable order (e.g. sorted by
+  platform. (`dodgy_2d` has a `libm` feature for its `VisibilitySet`, which
+  needs trigonometry; `dodgy_3d` never does.) Give neighbours in a stable order (e.g. sorted by
   `id`): the result is mathematically independent of the order, but the last
   bits are not. Inputs must be finite: NaN payloads are not portable.
 - **glam 0.33** instead of 0.29.

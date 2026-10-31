@@ -15,6 +15,7 @@ keywords = ["orca", "rvo", "collision", "avoidance", "navigation"]
 
 [dependencies]
 glam = { version = "0.33", default-features = false, features = ["std"] }
+libm = { version = "0.2", optional = true }
 
 [features]
 # Allows access to some of the internal data used to generate the final suggested velocity.
@@ -22,7 +23,7 @@ debug = []
 # The O(n^2) reference `Simulator`. Not needed when feeding
 # `Agent::compute_avoiding_velocity` with your own neighbour queries.
 simulator = []
-# `VisibilitySet`, a helper to cull hidden obstacle edges. It uses platform
-# trigonometry (`atan2`, `sin`) and returns a `HashSet`, so it is kept out of
-# the deterministic default build.
-visibility-set = []
+# Deterministic trigonometry through the pure-Rust `libm` crate (the same bits
+# on every target). Enables `VisibilitySet`, which needs trigonometry; the
+# per-agent ORCA computation never does, with or without this feature.
+libm = ["dep:libm"]

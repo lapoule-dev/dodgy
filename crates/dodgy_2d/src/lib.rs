@@ -25,7 +25,7 @@ mod obstacles;
 #[cfg(feature = "simulator")]
 mod simulator;
 mod tie_break;
-#[cfg(feature = "visibility-set")]
+#[cfg(feature = "libm")]
 mod visibility_set;
 
 #[cfg(feature = "debug")]
@@ -43,7 +43,7 @@ pub use obstacles::Obstacle;
 
 #[cfg(feature = "simulator")]
 pub use simulator::{AgentParameters, Simulator, SimulatorMargin};
-#[cfg(feature = "visibility-set")]
+#[cfg(feature = "libm")]
 pub use visibility_set::VisibilitySet;
 
 /// A single agent in the simulation.

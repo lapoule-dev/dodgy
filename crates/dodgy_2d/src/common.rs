@@ -10,7 +10,7 @@ pub fn determinant(a: Vec2, b: Vec2) -> f32 {
 /// is allowed to be any number, even negative or greater than one. The
 /// resulting Vec2 contains the time for line 1 in the x component, and the time
 /// for line 2 in the y component.
-#[cfg(any(test, feature = "visibility-set"))]
+#[cfg(any(test, feature = "libm"))]
 pub fn time_to_intersect_lines(
   line_1_start: Vec2,
   line_1_end: Vec2,

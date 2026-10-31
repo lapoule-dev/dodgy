@@ -37,12 +37,16 @@ jobs:
         run: cargo test --all-targets
       - name: cargo test --doc
         run: cargo test --doc
+      - name: cargo test --features libm (VisibilitySet goldens)
+        run: cargo test --features libm --all-targets
       - name: cargo test --all-features
         run: cargo test --all-features --all-targets
       - name: cargo test --all-features --doc
         run: cargo test --all-features --doc
       - name: cargo test --release (determinism goldens with optimizations)
         run: cargo test --release --all-targets
+      - name: cargo test --release --features libm
+        run: cargo test --release --features libm --all-targets
   wasm:
     name: wasm32 check
     runs-on: ubuntu-latest
@@ -52,19 +56,21 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - run: cargo check --workspace --target wasm32-unknown-unknown
+      - run: cargo check --workspace --features libm --target wasm32-unknown-unknown
   determinism_lint:
     name: Determinism lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: No randomness, hash containers, transcendentals or FMA in the default build
+      - name: No randomness, hash containers, platform transcendentals or FMA in the default build
         run: |
-          # Sources compiled with default features. The `simulator` and
-          # `visibility-set` modules are behind optional features, tests are
-          # excluded.
+          # All non-test sources, whatever the features, except the optional
+          # O(n^2) `Simulator` (which uses a HashMap). Transcendentals must go
+          # through `libm::` (pure Rust, same bits everywhere), never through
+          # the platform `f32` methods or glam's angle helpers.
           files=$(ls crates/*/src/*.rs \
-            | grep -v -e '_test\.rs$' -e '/simulator\.rs$' -e '/visibility_set\.rs$')
-          if grep -nE '\brand\b|HashMap|HashSet|mul_add|\.(sin|cos|tan|asin|acos|atan2?|sin_cos|exp|exp2|ln|log2|log10|powf|powi|hypot|cbrt)\(' $files; then
+            | grep -v -e '_test\.rs$' -e '/simulator\.rs$')
+          if grep -nE '\brand\b|HashMap|HashSet|mul_add|\.(sin|cos|tan|asin|acos|atan|atan2|sin_cos|sinh|cosh|tanh|exp|exp2|exp_m1|ln|ln_1p|log|log2|log10|powf|powi|hypot|cbrt|from_angle|angle_to|angle_between|to_angle|rotate|rotate_towards)\(' $files; then
             echo "::error::non-deterministic construct in the default build"
             exit 1
           fi
@@ -78,6 +84,7 @@ jobs:
           components: clippy
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo clippy --workspace --all-targets --features=debug -- -D warnings
+      - run: cargo clippy --workspace --all-targets --features=libm -- -D warnings
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
   format:
     name: Format

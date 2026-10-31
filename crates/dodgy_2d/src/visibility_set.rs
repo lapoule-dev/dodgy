@@ -1,9 +1,19 @@
-use std::{collections::HashSet, f32::consts::PI, mem::swap};
+use std::{collections::BTreeSet, f32::consts::PI, mem::swap};
 
 use glam::Vec2;
 
 use crate::common::time_to_intersect_lines;
 
+/// A set of line segments seen from the origin, used to cull obstacle edges
+/// hidden behind others.
+///
+/// # Determinism
+///
+/// This type needs trigonometry, so it is only available with the `libm`
+/// feature: all trigonometry then goes through the pure-Rust [`libm`] crate
+/// (the same bits on every target), and the visible ids are returned in a
+/// sorted container, so the results are bit-identical on every platform for
+/// the same sequence of calls.
 pub struct VisibilitySet {
   cones: Vec<Cone>,
   next_id: u32,
@@ -252,7 +262,9 @@ impl VisibilitySet {
     }
   }
 
-  pub fn get_visible_line_ids(&self) -> HashSet<u32> {
+  /// The ids of the lines that are at least partially visible, in increasing
+  /// order.
+  pub fn get_visible_line_ids(&self) -> BTreeSet<u32> {
     self.cones.iter().map(|cone| cone.line_id).collect()
   }
 }
@@ -332,7 +344,9 @@ impl Cone {
   }
 
   fn derive_related_angle(left_point: Vec2, right_point: Vec2) -> f32 {
-    Vec2::angle_to(left_point - right_point, left_point)
+    // The signed angle from `left_point - right_point` to `left_point`.
+    let from = left_point - right_point;
+    libm::atan2f(from.perp_dot(left_point), from.dot(left_point))
   }
 
   fn distance_at_angle(&self, angle: f32) -> f32 {
@@ -344,13 +358,14 @@ impl Cone {
       relative_angle
     };
 
-    self.left_ray.distance * self.related_angle.sin()
-      / (relative_angle + self.related_angle).sin()
+    self.left_ray.distance * libm::sinf(self.related_angle)
+      / libm::sinf(relative_angle + self.related_angle)
   }
 
   fn ray_at_angle(&self, angle: f32) -> ConeRay {
     let distance = self.distance_at_angle(angle);
-    ConeRay { angle, distance, point: distance * Vec2::from_angle(angle) }
+    let direction = Vec2::new(libm::cosf(angle), libm::sinf(angle));
+    ConeRay { angle, distance, point: distance * direction }
   }
 
   fn overlaps_cone(&self, other: Cone) -> bool {
@@ -392,7 +407,7 @@ struct ConeRay {
 
 impl ConeRay {
   fn from_point(point: Vec2) -> ConeRay {
-    let angle = point.y.atan2(point.x);
+    let angle = libm::atan2f(point.y, point.x);
     ConeRay {
       angle: if angle >= 0.0 { angle } else { 2.0 * PI + angle },
       distance: point.length(),
@@ -404,3 +419,7 @@ impl ConeRay {
 #[cfg(test)]
 #[path = "visibility_set_test.rs"]
 mod test;
+
+#[cfg(test)]
+#[path = "visibility_set_determinism_test.rs"]
+mod determinism_test;
