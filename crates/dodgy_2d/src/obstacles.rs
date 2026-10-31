@@ -388,21 +388,23 @@ fn get_line_for_agent_to_edge(
   let mut is_right_shadow_covered = false;
 
   let left_edge_direction = left_left_vertex.map(|v| v - left_vertex.point);
-  if left_vertex.convex
-    && left_edge_direction.is_some()
-    && determinant(left_shadow_direction, left_edge_direction.unwrap()) >= 0.0
-  {
-    left_shadow_direction = left_edge_direction.unwrap().normalize();
-    is_left_shadow_covered = true;
+  if let Some(left_edge_direction) = left_edge_direction {
+    if left_vertex.convex
+      && determinant(left_shadow_direction, left_edge_direction) >= 0.0
+    {
+      left_shadow_direction = left_edge_direction.normalize();
+      is_left_shadow_covered = true;
+    }
   }
 
   let right_edge_direction = right_right_vertex.map(|v| v - right_vertex.point);
-  if right_vertex.convex
-    && right_edge_direction.is_some()
-    && determinant(right_shadow_direction, right_edge_direction.unwrap()) <= 0.0
-  {
-    right_shadow_direction = right_edge_direction.unwrap().normalize();
-    is_right_shadow_covered = true;
+  if let Some(right_edge_direction) = right_edge_direction {
+    if right_vertex.convex
+      && determinant(right_shadow_direction, right_edge_direction) <= 0.0
+    {
+      right_shadow_direction = right_edge_direction.normalize();
+      is_right_shadow_covered = true;
+    }
   }
 
   // The previously computed relative positions are no longer valid since it is

@@ -23,6 +23,7 @@ fn two_agent_one_obstacle_simulation() {
 
   simulator.add_agent(
     Agent {
+      id: 0,
       position: Vec2::new(10.0, 0.0),
       velocity: Vec2::ZERO,
       radius: 1.0,
@@ -39,6 +40,7 @@ fn two_agent_one_obstacle_simulation() {
 
   simulator.add_agent(
     Agent {
+      id: 1,
       position: Vec2::new(-10.0, 0.0),
       velocity: Vec2::ZERO,
       radius: 1.0,

@@ -1,5 +1,44 @@
 # dodgy_2d
 
+## lapoule-dev fork
+
+This is the [lapoule-dev](https://github.com/lapoule-dev/dodgy) fork of
+[andriyDev/dodgy](https://github.com/andriyDev/dodgy). It is used by a
+multithreaded, deterministic game server, where the same inputs must give the
+same bits (for replays, journal verification and simulation parity). It differs
+from upstream as follows:
+
+- **Deterministic tie-break.** Upstream calls `rand::random()` when an agent
+  and a neighbour are exactly on top of each other with the same velocity.
+  Here, `Agent` has a new `id: u64` field, a caller-provided key (an entity id
+  is a good choice). In that degenerate case the separation direction is
+  derived from the pair of keys with integer hashing: the agent with the
+  smaller key moves along some direction `d`, the other one along `-d`. The
+  `rand` dependency is gone.
+- **Portable arithmetic.** The per-agent computation uses only `+ - * /`,
+  `sqrt` and comparisons (no trigonometry, no fused multiply-add, no hash
+  containers), so `Agent::compute_avoiding_velocity` gives bit-identical
+  results on every platform. Give neighbours and obstacles in a stable order
+  (e.g. sorted by `id`): the result is mathematically independent of the
+  order, but the last bits are not. Inputs must be finite: NaN payloads are
+  not portable.
+- **Transcendentals via libm.** `VisibilitySet` needs trigonometry, so it is
+  only compiled with the non-default `libm` feature. Its `atan2`, `sin` and
+  `cos` then come from the pure-Rust [`libm`](https://crates.io/crates/libm)
+  crate (the same bits on every target) instead of the platform `f32` methods,
+  and `get_visible_line_ids` returns a `BTreeSet` (stable iteration order)
+  instead of a `HashSet`. Without the feature, nothing in the crate uses
+  trigonometry.
+- **glam 0.33** instead of 0.29.
+- **Optional `Simulator`.** The O(n²) `Simulator` is behind the non-default
+  `simulator` feature. The default build is just the per-agent ORCA
+  computation, fed with your own neighbour queries.
+- **Determinism tests**, including recorded golden scenes (ORCA, and
+  `VisibilitySet` with `libm`) that CI checks on Linux (x86_64) and macOS
+  (aarch64), and a wasm32 build check.
+
+We intend to propose these changes upstream.
+
 A Rust crate to compute local collision avoidance (specifically ORCA) for agents.
 
 ## Why local collision avoidance?
@@ -31,6 +70,8 @@ use dodgy_2d::{Agent, AvoidanceOptions, Obstacle, Vec2};
 
 let mut agents: Vec<Cow<'static, Agent>> = vec![
   Cow::Owned(Agent {
+    // A unique key, used to break ties deterministically.
+    id: 0,
     position: Vec2::ZERO,
     velocity: Vec2::ZERO,
     radius: 1.0,
@@ -116,15 +157,17 @@ spatial query. Often, finding related objects within some radius is performed
 anyway in most game engines. Using this API, neighbours can be found through
 your regular spatial queries, and exposes just the avoidance part.
 
-However, an alternative using the `Simulator` struct:
+However, an alternative using the `Simulator` struct (requires the optional
+`simulator` feature):
 
-```rust
+```rust,ignore
 use dodgy_2d::{
   Agent, AvoidanceOptions, AgentParameters, Obstacle, Simulator, Vec2
 };
 
 let mut simulator = Simulator::new();
 simulator.add_agent(Agent {
+  id: 1,
   position: Vec2::ZERO,
   velocity: Vec2::ZERO,
   radius: 1.0,

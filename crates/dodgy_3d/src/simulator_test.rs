@@ -26,6 +26,7 @@ fn two_agent_simulation() {
 
   simulator.add_agent(
     Agent {
+      id: 0,
       // Perturb one agent slightly so they can find a reasonable solution.
       position: Vec3::new(10.0, 0.0, 0.01),
       velocity: Vec3::ZERO,
@@ -43,6 +44,7 @@ fn two_agent_simulation() {
 
   simulator.add_agent(
     Agent {
+      id: 1,
       position: Vec3::new(-10.0, 0.0, 0.0),
       velocity: Vec3::ZERO,
       radius: 1.0,

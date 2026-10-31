@@ -23,6 +23,7 @@ macro_rules! assert_line_eq {
 #[test]
 fn covered_edge_is_skipped() {
   let agent = Agent {
+    id: 0,
     position: Vec2::new(0.0, -1.0),
     velocity: Vec2::new(0.0, 0.0),
     radius: 1.0,
@@ -58,6 +59,7 @@ fn covered_edge_is_skipped() {
 #[test]
 fn agent_collides_with_edge() {
   let agent = Agent {
+    id: 1,
     position: Vec2::new(0.0, -0.1),
     velocity: Vec2::new(0.0, -1.0),
     radius: 1.0,
@@ -65,7 +67,7 @@ fn agent_collides_with_edge() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -86,6 +88,7 @@ fn agent_collides_with_edge() {
 #[test]
 fn agent_collides_with_left_vertex() {
   let agent = Agent {
+    id: 2,
     position: Vec2::new(-1.1, -0.1),
     velocity: Vec2::new(0.0, -1.0),
     radius: 1.0,
@@ -93,7 +96,7 @@ fn agent_collides_with_left_vertex() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -114,13 +117,14 @@ fn agent_collides_with_left_vertex() {
 #[test]
 fn agent_collides_with_right_vertex_with_line() {
   let agent = Agent {
+    id: 3,
     position: Vec2::new(1.1, -0.1),
     velocity: Vec2::new(0.0, -1.0),
     radius: 1.0,
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0)];
+  let vertices = [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -141,6 +145,7 @@ fn agent_collides_with_right_vertex_with_line() {
 #[test]
 fn agent_collides_with_right_vertex_handled_by_next_edge() {
   let agent = Agent {
+    id: 4,
     position: Vec2::new(1.1, -0.1),
     velocity: Vec2::new(0.0, -1.0),
     radius: 1.0,
@@ -148,7 +153,7 @@ fn agent_collides_with_right_vertex_handled_by_next_edge() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -178,6 +183,7 @@ fn agent_collides_with_right_vertex_handled_by_next_edge() {
 #[test]
 fn agent_velocity_projects_to_cutoff_line() {
   let agent = Agent {
+    id: 5,
     position: Vec2::new(0.0, -2.0),
     velocity: Vec2::new(0.5, -1.0),
     radius: 1.0,
@@ -185,7 +191,7 @@ fn agent_velocity_projects_to_cutoff_line() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -206,6 +212,7 @@ fn agent_velocity_projects_to_cutoff_line() {
 #[test]
 fn agent_velocity_projects_to_shadows() {
   let mut agent = Agent {
+    id: 6,
     position: Vec2::new(0.0, -2.0),
     velocity: Vec2::new(3.0, 3.0),
     radius: 1.0,
@@ -213,7 +220,7 @@ fn agent_velocity_projects_to_shadows() {
   };
 
   let vertices =
-    vec![Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
+    [Vec2::new(-1.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -251,13 +258,14 @@ fn agent_velocity_projects_to_shadows() {
 #[test]
 fn agent_velocity_projects_to_covered_shadows_creates_no_lines() {
   let mut agent = Agent {
+    id: 7,
     position: Vec2::new(0.0, -2.0),
     velocity: Vec2::new(-10.0, 0.0),
     radius: 1.0,
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![
+  let vertices = [
     Vec2::new(-2.0, 0.5),
     Vec2::new(-1.0, 0.0),
     Vec2::new(1.0, 0.0),
@@ -318,13 +326,14 @@ fn agent_velocity_projects_to_covered_shadows_creates_no_lines() {
 #[test]
 fn backwards_edges_are_ignored() {
   let agent = Agent {
+    id: 8,
     position: Vec2::new(0.0, 0.0),
     velocity: Vec2::new(0.0, 0.0),
     radius: 1.0,
     avoidance_responsibility: 1.0,
   };
 
-  let vertices = vec![Vec2::new(-1.0, -1.0), Vec2::new(-1.0, 1.0)];
+  let vertices = [Vec2::new(-1.0, -1.0), Vec2::new(-1.0, 1.0)];
 
   let line = get_line_for_agent_to_edge(
     &agent,
@@ -358,6 +367,7 @@ fn backwards_edges_are_ignored() {
 #[test]
 fn velocity_projects_to_cutoff_endpoints() {
   let mut agent = Agent {
+    id: 9,
     position: Vec2::ZERO,
     velocity: Vec2::new(3.0, 0.0),
     radius: 0.0,
@@ -406,6 +416,7 @@ fn velocity_projects_to_cutoff_endpoints() {
 #[test]
 fn velocity_projects_to_degenerate_edge() {
   let agent = Agent {
+    id: 10,
     position: Vec2::ZERO,
     velocity: Vec2::ZERO,
     radius: 0.0,
@@ -431,6 +442,7 @@ fn velocity_projects_to_degenerate_edge() {
 #[test]
 fn shadow_of_endpoint_covers_edge() {
   let mut agent = Agent {
+    id: 11,
     position: Vec2::ZERO,
     velocity: Vec2::new(-0.5, 3.0),
     radius: 1.0,
@@ -513,6 +525,7 @@ macro_rules! assert_lines_eq_unordered {
 #[test]
 fn lines_generated_for_closed_convex_obstacle() {
   let mut agent = Agent {
+    id: 12,
     position: Vec2::ZERO,
     velocity: Vec2::new(0.5, 3.0),
     radius: 0.0,
@@ -577,6 +590,7 @@ fn lines_generated_for_closed_convex_obstacle() {
 #[test]
 fn lines_generated_for_open_convex_obstacle() {
   let mut agent = Agent {
+    id: 13,
     position: Vec2::ZERO,
     velocity: Vec2::new(0.5, 3.0),
     radius: 0.0,
@@ -641,6 +655,7 @@ fn lines_generated_for_open_convex_obstacle() {
 #[test]
 fn velocity_projects_to_concave_corner() {
   let agent = Agent {
+    id: 14,
     position: Vec2::ZERO,
     velocity: Vec2::new(0.0, 3.0),
     radius: 0.0,
@@ -678,6 +693,7 @@ fn velocity_projects_to_concave_corner() {
 #[test]
 fn no_line_for_projecting_to_concave_endpoint_covered_by_shadow() {
   let agent = Agent {
+    id: 15,
     position: Vec2::ZERO,
     velocity: Vec2::ZERO,
     radius: 0.0,
@@ -731,6 +747,7 @@ fn no_line_for_projecting_to_concave_endpoint_covered_by_shadow() {
 #[test]
 fn collision_with_non_back_face_culled_edge_ignored() {
   let mut agent = Agent {
+    id: 16,
     position: Vec2::new(0.0, -0.5),
     velocity: Vec2::ZERO,
     radius: 1.0,
@@ -779,6 +796,7 @@ fn collision_with_non_back_face_culled_edge_ignored() {
 #[test]
 fn collision_with_convex_vertex() {
   let mut agent = Agent {
+    id: 17,
     position: Vec2::new(0.1, -0.1),
     velocity: Vec2::ZERO,
     radius: 1.0,
